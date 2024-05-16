@@ -5,7 +5,7 @@ import { app } from './app.js';
 
 // for using dotenv using 'import' we need to use experimental feature and do some change in the 'package.json' file
 dotenv.config({
-    path: './env'
+    path: './.env'
 });
 
 connectDB()

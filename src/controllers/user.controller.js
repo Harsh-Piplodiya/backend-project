@@ -24,7 +24,7 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new ApiError(400, "All fields are required!");
     }
 
-    const userExists = User.findOne({
+    const userExists = await User.findOne({
         $or: [{ username }, { email }]
     })
 
@@ -34,7 +34,12 @@ const registerUser = asyncHandler( async (req, res) => {
 
     // multer gives us access to the files, but we might or might not have access of the files then we take the first object of the avatar as it allows us to choose the path i.e from this we get the whole path of the avatar
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path; // this was giving us error for undefined.
+
+    let coverImageLocalPath;
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0){
+        coverImageLocalPath = req.files.coverImage[0].path;
+    }
 
     if(!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is required!");

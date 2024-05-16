@@ -1,4 +1,4 @@
-import mongoose, { Schema } from mongoose;
+import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken"; // mongoose library used for tokens also based on cryptography
 import bcrypt from "bcrypt"; // mongoose library based on cryptography used to hash passwords
 
