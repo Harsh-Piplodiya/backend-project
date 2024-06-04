@@ -428,9 +428,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                             ]
                         }
                     },
-                    // we added this another pipeline as the fields are stored in an array form and are in the first entry of array, using this pipeline we structured the data so that the front-end can easily get the data. (we could've also got the data for the front end by getting it from the 1st index of the array)
-
-                    
+                    // after hte first lookup for the user we get an array that is in the first place of hte array, for the convinience of the front-end we structured in a way that the data be stored directly using this second pipeline.
                     {
                         $addFields: {
                             owner: {
@@ -442,6 +440,10 @@ const getWatchHistory = asyncHandler(async (req, res) => {
             }
         }
     ])
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user[0].watchHistory, "Watch History fetched successfully."));
 })
 
 export { 
@@ -454,5 +456,6 @@ export {
     updateAccountDetails,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 }
