@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import mongoose from "mongoose";
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -396,6 +397,51 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(new ApiResponse(200, channel[0], "User channel fetched successfully."))
+})
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+    const user = await User.aggregate([
+        {
+            $match: new mongoose.Types.ObjectId(req.user._id) // we need to convert the ID into ObjectID as that is how the MongoDb Id is stored as we get the ID from mongoose in the form of a String.
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullName: 1,
+                                        userName: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    // we added this another pipeline as the fields are stored in an array form and are in the first entry of array, using this pipeline we structured the data so that the front-end can easily get the data. (we could've also got the data for the front end by getting it from the 1st index of the array)
+
+                    
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
 })
 
 export { 
